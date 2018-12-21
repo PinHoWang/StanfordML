@@ -26,13 +26,12 @@ sigma = zeros(1, size(X, 2));
 % Hint: You might find the 'mean' and 'std' functions useful.
 %       
 
+mu = [mean(X_norm(:,1)) mean(X_norm(:,2))];
+sigma = [std(X_norm(:,1)) std(X_norm(:,2))];
 
-
-
-
-
-
-
+for i = 1 : size(X_norm, 2)
+    X_norm(:,1) = (X_norm(:,1) - mu(:,1)) / sigma(:,1);
+end
 
 % ============================================================
 
