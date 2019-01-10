@@ -62,10 +62,16 @@ Theta2_grad = zeros(size(Theta2));
 %               and Theta2_grad from Part 2.
 %
 
+% Part1: Feedforward Propagation
+
 XX = [ones(m, 1) X];
-a2 = sigmoid(XX * Theta1');
+a1 = XX;
+z2 = a1 * Theta1';
+a2 = sigmoid(z2);
 a2 = [ones(m, 1) a2];
-h = sigmoid(a2 * Theta2');
+z3 = a2 * Theta2';
+a3 = sigmoid(z3);
+
 yy = zeros(size(y, 1), num_labels);
 for i = 1 : m
     yy(i, y(i)) = 1;
@@ -74,8 +80,8 @@ end
 result1 = zeros(m, 1);
 result2 = result1;
 for j = 1 : m
-    result1(j) = yy(j, :) * log(h(j, :))';
-    result2(j) = (1-yy(j, :)) * log(1-h(j, :))';
+    result1(j) = yy(j, :) * log(a3(j, :))';
+    result2(j) = (1-yy(j, :)) * log(1-a3(j, :))';
 end
 
 Theta11 = Theta1;
@@ -83,25 +89,18 @@ Theta11(:, 1) = 0;
 Theta22 = Theta2;
 Theta22(:, 1) = 0;
 J = -(sum(result1 + result2)) / m ...
-   + (sum(Theta11.^2, 'all') + sum(Theta22.^2, 'all'))*lambda/(2*m);
+   + (sum(sum(Theta11.^2)) + sum(sum(Theta22.^2)))*lambda/(2*m);
 
 
-for i = 1 : m
-   a1 = XX(i,:);
-   a2 = sigmoid(a1 * Theta1(i,:)');
-   a2 = [1 a2];
-   h = sigmoid(a2 * Theta2(i,:)');
-   
-    
-    
-end
+% Part2: Backpropagation algorithm
+delta3 = a3 - yy;
+delta2 = (delta3 * Theta2) .* [ones(m, 1) sigmoidGradient(z2)];
 
+Delta1 = delta2' * a1;
+Delta2 = delta3' * a2;
 
-
-
-
-
-
+Theta1_grad = Delta1(2:end,:) / m + lambda*Theta11 / m;
+Theta2_grad = Delta2 / m + lambda*Theta22 / m;
 
 
 
