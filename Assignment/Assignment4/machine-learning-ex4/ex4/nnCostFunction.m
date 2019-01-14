@@ -77,30 +77,27 @@ for i = 1 : m
     yy(i, y(i)) = 1;
 end
 
-result1 = zeros(m, 1);
-result2 = result1;
 for j = 1 : m
-    result1(j) = yy(j, :) * log(a3(j, :))';
-    result2(j) = (1-yy(j, :)) * log(1-a3(j, :))';
+    J = J ...
+        -((yy(j,:) * log(a3(j,:))') + ((1 - yy(j,:)) * log(1-a3(j,:))')) / m;
 end
 
-Theta11 = Theta1;
-Theta11(:, 1) = 0;
-Theta22 = Theta2;
-Theta22(:, 1) = 0;
-J = -(sum(result1 + result2)) / m ...
-   + (sum(sum(Theta11.^2)) + sum(sum(Theta22.^2)))*lambda/(2*m);
+J = J + (sum(sum([zeros(size(Theta1,1),1) Theta1(:,2:end)].^2)) ...
+        + sum(sum([zeros(size(Theta2,1),1) Theta2(:,2:end)].^2)))*lambda/(2*m);
 
 
 % Part2: Backpropagation algorithm
 delta3 = a3 - yy;
 delta2 = (delta3 * Theta2) .* [ones(m, 1) sigmoidGradient(z2)];
+delta2 = delta2(:,2:end);
 
 Delta1 = delta2' * a1;
 Delta2 = delta3' * a2;
 
-Theta1_grad = Delta1(2:end,:) / m + lambda*Theta11 / m;
-Theta2_grad = Delta2 / m + lambda*Theta22 / m;
+%disp(size(Delta1));
+%disp(size([zeros(size(Theta1,1)) Theta1(:,2:end)]));
+Theta1_grad = Delta1 / m + lambda*[zeros(size(Theta1,1),1) Theta1(:,2:end)] / m;
+Theta2_grad = Delta2 / m + lambda*[zeros(size(Theta2,1),1) Theta2(:,2:end)] / m;
 
 
 
